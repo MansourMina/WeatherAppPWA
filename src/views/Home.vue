@@ -1,26 +1,28 @@
 <template>
-  <v-container class="mt-10 px-16" fluid>
-    <v-toolbar dense absolute class="mt-10" width="500">
-      <v-text-field
-        hide-details
-        prepend-icon="mdi-magnify"
-        single-line
-        v-model="search"
-      ></v-text-field>
-      <v-btn
-        icon
-        target="_blank"
-        :href="`https://www.google.com/maps/place/${search}`"
-        :disabled="search.length == 0"
-      >
-        <v-icon>mdi-map-marker-outline</v-icon>
-      </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-crosshairs-gps</v-icon>
-      </v-btn>
-    </v-toolbar>
+  <v-container  fluid>
+    <div>
+      <v-toolbar dense class="my-10 mr-auto" width="500">
+        <v-text-field
+          hide-details
+          prepend-icon="mdi-magnify"
+          single-line
+          v-model="search"
+        ></v-text-field>
+        <v-btn
+          icon
+          target="_blank"
+          :href="`https://www.google.com/maps/place/${search}`"
+          :disabled="search.length == 0"
+        >
+          <v-icon>mdi-map-marker-outline</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-icon>mdi-crosshairs-gps</v-icon>
+        </v-btn>
+      </v-toolbar>
+    </div>
     <v-card justify-content-center color="transparent" elevation="0">
-      <v-container fluid class="px-16">
+      <v-container>
         <v-row
           ><v-col cols="12" md="7" lg="7">
             <v-img class="mt-5 mx-auto" src="test.png" width="100px" />
