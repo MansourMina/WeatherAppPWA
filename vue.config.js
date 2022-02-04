@@ -1,0 +1,28 @@
+module.exports = {
+  pwa: {
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      swSrc: 'public/service-worker.js',
+    },
+    manifestOptions: {
+      name: 'Weather App',
+      short_name: 'WeatherApp',
+      theme_color: '#000',
+      background_color: '#0d187b',
+      icons: [
+        {
+          src: './img/icons/android-chrome-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: './img/icons/android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    },
+  },
+
+  transpileDependencies: ['vuetify'],
+};
