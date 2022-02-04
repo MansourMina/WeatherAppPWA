@@ -6,8 +6,8 @@ module.exports = {
     },
     manifestOptions: {
       name: 'Weather App',
-      short_name: 'WeatherApp',
-      theme_color: '#000',
+      short_name: 'Weather',
+      theme_color: '#002699',
       background_color: '#0d187b',
       icons: [
         {

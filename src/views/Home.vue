@@ -1,7 +1,7 @@
 <template>
   <v-container  fluid>
     <div>
-      <v-toolbar dense class="my-10 mr-auto" width="500">
+      <v-toolbar dense class="mb-10 mt-5 mr-auto" width="500">
         <v-text-field
           hide-details
           prepend-icon="mdi-magnify"
