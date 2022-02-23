@@ -109,7 +109,7 @@ export default {
       currentWeather: '',
       countryName: 'Vienna',
       timeofCity: '23.02.2022, 13:14',
-      description: 'Clouds',
+      description: '',
       search: '',
       long: '',
       lat: '',
