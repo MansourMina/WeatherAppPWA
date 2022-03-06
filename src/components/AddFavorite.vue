@@ -5,12 +5,6 @@
     </v-card-title>
     <v-card-text>
       <v-container>
-        <v-row>
-          {{ color }}
-          <v-col cols="12" sm="6" md="4">
-            <v-text-field :label="city" solo></v-text-field>
-          </v-col>
-        </v-row>
         <v-color-picker
           hide-canvas
           hide-inputs
@@ -27,7 +21,9 @@
       <v-btn color="blue darken-1" text @click="$emit('closeDialog')">
         Close
       </v-btn>
-      <v-btn color="blue darken-1" text @click="addFavorite()"> Save </v-btn>
+      <v-btn color="blue darken-1" text @click="$emit('saveAndColor', color)">
+        Save
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>

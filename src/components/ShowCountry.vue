@@ -1,13 +1,21 @@
 <template>
   <v-card>
-    <v-toolbar dark color="primary" class="fixed-bar">
+    <v-toolbar dark class="fixed-bar">
       <v-btn icon dark @click="$emit('closeDialog')">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn dark text @click="dialog = false"> Hinzufügen </v-btn>
-      </v-toolbar-items>
+
+      <v-dialog v-model="dialog" max-width="1000">
+        <template v-slot:activator="{ on, attrs }">
+          <v-toolbar-items>
+            <v-btn dark text @click="dialog = false" v-bind="attrs" v-on="on">
+              Hinzufügen
+            </v-btn>
+          </v-toolbar-items>
+        </template>
+        <AddFavorite @closeDialog="dialog = false" @saveAndColor="newJson" />
+      </v-dialog>
     </v-toolbar>
     <Home
       :json="json"
@@ -20,14 +28,20 @@
 
 <script>
 import Home from '@/views/Home.vue';
+import AddFavorite from '@/components/AddFavorite.vue';
+import { openDB } from 'idb';
+
 export default {
   data() {
     return {
       dialog: false,
+      country: {},
+      db: null,
     };
   },
   components: {
     Home,
+    AddFavorite,
   },
   props: {
     json: {
@@ -36,6 +50,31 @@ export default {
     getTime: {
       type: Function,
     },
+  },
+  methods: {
+    newJson(color) {
+      this.newJson = this.json;
+      this.newJson.color = color;
+      this.$emit('addFavorite', this.newJson);
+      this.dialog = false;
+      console.log(this.newJson);
+    },
+  },
+  async created() {
+    this.db = await openDB('favoriteCountriesDB', 1, {
+      upgrade(db) {
+        db.createObjectStore('countries', { keyPath: 'countryName' });
+      },
+    });
+    console.log('diesdas', this.json);
+    // try {
+    //   console.log(
+    //     'Hallo',
+    //     await this.db.get('countries', this.json.countryName),
+    //   );
+    // } catch (err) {
+    //   console.log(err);
+    // }
   },
 };
 </script>

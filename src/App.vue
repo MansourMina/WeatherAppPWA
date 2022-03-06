@@ -1,6 +1,45 @@
 <template>
   <v-app>
-    <v-footer app height="80" id="footer">
+    <v-bottom-navigation v-model="value" shift app>
+      <v-btn
+        plain
+        active-class="blue--text transparent"
+        to="/"
+        height="50"
+        exact
+      >
+        <span class="pa-2">Wetter</span>
+
+        <v-icon medium> mdi-thermometer </v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
+
+      <v-btn
+        plain
+        active-class="blue--text transparent"
+        to="/favorite"
+        height="50"
+        exact
+      >
+        <span class="pa-2">Favoriten</span>
+
+        <v-icon medium> mdi-star </v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
+
+      <v-btn
+        plain
+        active-class="blue--text transparent"
+        to="/about"
+        height="50"
+        exact
+      >
+        <span class="pa-2">About</span>
+
+        <v-icon medium> mdi-information </v-icon>
+      </v-btn>
+    </v-bottom-navigation>
+    <!-- <v-footer app height="80" id="footer">
       <v-btn
         plain
         active-class="blue--text transparent"
@@ -46,7 +85,7 @@
           <v-row> About </v-row>
         </v-col>
       </v-btn>
-    </v-footer>
+    </v-footer> -->
 
     <v-main :class="$route.name == 'Favoriten' ? 'black' : 'none'">
       <router-view
@@ -54,6 +93,7 @@
         :getTime="getTime"
         @refreshTime="timeofCity = getTime(zoneName)"
         @refreshWeather="apiCall"
+        @searchCountry="getWeatherOfCountry"
       />
     </v-main>
   </v-app>
@@ -93,8 +133,9 @@ export default {
     dialog: false,
     timeZoneKey: '1OPC3LTOMNKY',
     newJson: {},
+    value: 1,
   }),
-  created() {
+  mounted() {
     // if (this.searchCountry != null) {
     //   const api = `https://api.openweathermap.org/data/2.5/weather?q=${this.searchCountry}&appid=${this.openweatherKey}`;
 
@@ -118,9 +159,23 @@ export default {
     }
   },
   methods: {
+    async getWeatherOfCountry(country) {
+      const api = `https://api.openweathermap.org/data/2.5/weather?q=${country}&appid=${this.openweatherKey}`;
+      const response = await fetch(api);
+
+      if (!response.ok) {
+        // this.clickMethod = false;
+        this.message = 'Can not read Position';
+      } else {
+        const json = await response.json();
+        await this.getWeather(json);
+        // this.waiting = false;
+      }
+    },
     async apiCall() {
       //  if (status == 'current') {
       // this.waiting = true;
+
       const api = `https://api.openweathermap.org/data/2.5/weather?lat=${this.lat}&lon=${this.long}&appid=${this.openweatherKey}`;
 
       const response = await fetch(api);
@@ -171,7 +226,6 @@ export default {
     async getWeather(json) {
       this.currentWeather = Math.ceil(json.main.temp - 273.15) + '°';
       this.countryName = json.name;
-      console.log(json);
       this.description = json.weather[0].main;
       let weatherIcon = json.weather[0].icon;
       this.imageWeather = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
@@ -180,6 +234,7 @@ export default {
       this.tmin = Math.ceil(json.main.temp_min - 273.15) + '°';
       this.timeofCity = this.getTime(await this.getTimeZone());
       this.changeBackground();
+      this.humidity = json.main.humidity + '%';
 
       this.newJson = {
         currentWeather: this.currentWeather,
@@ -191,11 +246,11 @@ export default {
         tmin: this.tmin,
         timeofCity: this.timeofCity,
         background: this.background,
+        humidity: this.humidity,
       };
 
       // this.sunrise = sunriseSunset.format(new Date(json.sys.sunrise * 1000));
       // this.sunset = sunriseSunset.format(new Date(json.sys.sunset * 1000));
-      this.humidity = json.main.humidity + '%';
     },
   },
 };
