@@ -89,7 +89,12 @@
     <div class="red darken-4 text-center" role="alert" v-if="offline">
       <span class="white--text">You are offline...</span>
     </div>
-    <v-main :class="$route.name == 'Favoriten' ? 'black' : background">
+
+    <v-main
+      :style="`background-color: ${
+        $route.name == 'Favoriten' ? 'black' : background
+      }`"
+    >
       <router-view
         :json="newJson"
         :offline="offline"

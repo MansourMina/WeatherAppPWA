@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid :style="`background-color: ${json.background}`">
+  <v-container fluid>
     <v-card justify-content-center color="transparent" elevation="0">
       <v-container>
         <v-row
