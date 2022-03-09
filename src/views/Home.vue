@@ -13,8 +13,12 @@
               <h1 class="display-4 white--text">
                 {{ json.currentWeather }}
               </h1>
-              <h1 class="mt-5 mb-0 white--text" v-if="json.found">{{ json.countryName }}</h1>
-              <h1 class="mt-5 mb-0 white--text" v-else>{{ json.countryName }}</h1>
+              <h1 class="mt-5 mb-0 white--text" v-if="json.found">
+                {{ json.countryName }}
+              </h1>
+              <h1 class="mt-5 mb-0 white--text" v-else>
+                {{ json.countryName }}
+              </h1>
               <h4 class="white--text font-weight-light">
                 {{ json.timeofCity }}
               </h4>
@@ -51,14 +55,6 @@
                   <p class="details mb-0 caption">Humidity</p>
                   <p class="white--text body-1">{{ json.humidity }}</p>
                 </v-col>
-                <v-col cols="6" class="pa-0">
-                  <p class="details mb-0 caption">Sunrise</p>
-                  <p class="white--text body-1">20°</p>
-                </v-col>
-                <v-col cols="6" class="pa-0">
-                  <p class="details mb-0 caption">Sunset</p>
-                  <p class="white--text body-1">20°</p>
-                </v-col>
               </v-row>
             </v-card>
           </v-col>
@@ -76,16 +72,18 @@ export default {
   },
   name: 'Home',
   mounted: function () {
-    this.$nextTick(function () {
-      window.setInterval(async () => {
-        this.$emit('refreshWeather');
-        console.log('Minute vergangen');
-      }, 1000 * 60);
-      window.setInterval(async () => {
-        this.$emit('refreshTime');
-        this.json.timeofCity = this.getTime(this.json.zoneName);
-      }, 1000);
-    });
+    if (this.json != null) {
+      this.$nextTick(function () {
+        window.setInterval(async () => {
+          this.$emit('refreshWeather');
+          console.log('Minute vergangen');
+        }, 1000 * 60);
+        window.setInterval(async () => {
+          this.$emit('refreshTime');
+          this.json.timeofCity = this.getTime(this.json.zoneName);
+        }, 1000);
+      });
+    }
   },
   props: {
     json: {

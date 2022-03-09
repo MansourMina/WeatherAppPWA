@@ -17,17 +17,13 @@
         <AddFavorite @closeDialog="dialog = false" @saveAndColor="newJson" />
       </v-dialog>
     </v-toolbar>
-    <Home
-      :json="json"
-      :getTime="getTime"
-      @refreshTime="$emit('refreshTime')"
-      @refreshWeather="$emit('refreshWeather')"
-    />
+    <Search :country="country" />
+    {{ country }}
   </v-card>
 </template>
 
 <script>
-import Home from '@/views/Home.vue';
+import Search from '@/components/Search.vue';
 import AddFavorite from '@/components/AddFavorite.vue';
 import { openDB } from 'idb';
 
@@ -35,20 +31,19 @@ export default {
   data() {
     return {
       dialog: false,
-      country: {},
       db: null,
     };
   },
   components: {
-    Home,
+    Search,
     AddFavorite,
   },
   props: {
     json: {
       type: Object,
     },
-    getTime: {
-      type: Function,
+    country: {
+      type: String,
     },
   },
   methods: {
@@ -57,7 +52,6 @@ export default {
       this.newJson.color = color;
       this.$emit('addFavorite', this.newJson);
       this.dialog = false;
-      console.log(this.newJson);
     },
   },
   async created() {
@@ -66,7 +60,7 @@ export default {
         db.createObjectStore('countries', { keyPath: 'countryName' });
       },
     });
-    console.log('diesdas', this.json);
+
     // try {
     //   console.log(
     //     'Hallo',

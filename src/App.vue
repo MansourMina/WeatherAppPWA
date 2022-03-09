@@ -86,36 +86,31 @@
         </v-col>
       </v-btn>
     </v-footer> -->
-
-    <v-main :class="$route.name == 'Favoriten' ? 'black' : 'none'">
+    <div class="red darken-4 text-center" role="alert" v-if="offline">
+      <span class="white--text">You are offline...</span>
+    </div>
+    <v-main :class="$route.name == 'Favoriten' ? 'black' : background">
       <router-view
         :json="newJson"
+        :offline="offline"
         :getTime="getTime"
         @refreshTime="timeofCity = getTime(zoneName)"
         @refreshWeather="apiCall"
-        @searchCountry="getWeatherOfCountry"
       />
     </v-main>
   </v-app>
 </template>
 
 <script>
+import { openDB } from 'idb';
+
 export default {
   name: 'App',
-  // mounted: function () {
-  //   this.$nextTick(function () {
-  //     window.setInterval(async () => {
-  //       await this.getWeather();
-  //       console.log('Minute vergangen');
-  //     }, 1000 * 60);
-  //     window.setInterval(async () => {
-  //       this.timeofCity = this.getTime(this.zoneName);
-  //     }, 1000);
-  //   });
-  // },
   data: () => ({
     drawer: false,
     background: '',
+    sunset: '',
+    sunrise: '',
     zoneName: '',
     imageWeather: null,
     currentWeather: '',
@@ -130,25 +125,36 @@ export default {
     tmin: '',
     tmax: '',
     humidity: '',
+    offline: false,
     dialog: false,
     timeZoneKey: '1OPC3LTOMNKY',
     newJson: {},
     value: 1,
+    db: null,
   }),
+  async created() {
+    this.db = await openDB('favoriteCountriesDB', 1, {
+      upgrade(db) {
+        db.createObjectStore('countries', { keyPath: 'countryName' });
+      },
+    });
+  },
   mounted() {
-    // if (this.searchCountry != null) {
-    //   const api = `https://api.openweathermap.org/data/2.5/weather?q=${this.searchCountry}&appid=${this.openweatherKey}`;
+    document.addEventListener('swUpdated', this.updateAvailable, {
+      once: true,
+    });
 
-    //   const response = await fetch(api);
-
-    //   if (!response.ok) {
-    //     // this.clickMethod = false;
-    //     this.message = 'Can not read Position';
-    //   } else {
-    //     const json = await response.json();
-    //     await this.getWeather(json);
-    //     // this.waiting = false;
-    //   }
+    window.addEventListener('online', () => {
+      this.offline = false;
+    });
+    window.addEventListener('offline', () => {
+      this.offline = true;
+    });
+    if (navigator.onLine) {
+      this.offline = false;
+    } else {
+      this.offline = true;
+    }
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         this.long = position.coords.longitude;
@@ -159,19 +165,6 @@ export default {
     }
   },
   methods: {
-    async getWeatherOfCountry(country) {
-      const api = `https://api.openweathermap.org/data/2.5/weather?q=${country}&appid=${this.openweatherKey}`;
-      const response = await fetch(api);
-
-      if (!response.ok) {
-        // this.clickMethod = false;
-        this.message = 'Can not read Position';
-      } else {
-        const json = await response.json();
-        await this.getWeather(json);
-        // this.waiting = false;
-      }
-    },
     async apiCall() {
       //  if (status == 'current') {
       // this.waiting = true;
@@ -213,8 +206,7 @@ export default {
       }
     },
     async getTimeZone() {
-      const api = `https://api.timezonedb.com/v2.1/get-time-zone?key=${this.timeZoneKey}&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
-
+      const api = `http://api.timezonedb.com/v2.1/get-time-zone?key=${this.timeZoneKey}&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
       const response = await fetch(api);
       if (!response.ok) {
         console.log('etwas schiefgelaufen');
@@ -223,8 +215,12 @@ export default {
       this.zoneName = json.zoneName;
       return json.zoneName;
     },
+    updateAvailable() {
+      alert('Update vorhanden, bitte App neu starten');
+    },
     async getWeather(json) {
       this.currentWeather = Math.ceil(json.main.temp - 273.15) + '°';
+
       this.countryName = json.name;
       this.description = json.weather[0].main;
       let weatherIcon = json.weather[0].icon;
@@ -232,6 +228,7 @@ export default {
       this.feelsLike = Math.ceil(json.main.feels_like - 273.15) + '°';
       this.tmax = Math.ceil(json.main.temp_max - 273.15) + '°';
       this.tmin = Math.ceil(json.main.temp_min - 273.15) + '°';
+
       this.timeofCity = this.getTime(await this.getTimeZone());
       this.changeBackground();
       this.humidity = json.main.humidity + '%';
