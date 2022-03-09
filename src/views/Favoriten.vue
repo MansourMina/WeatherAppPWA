@@ -122,7 +122,7 @@ export default {
     async addFavorite(json) {
       await this.db.put('countries', json);
       this.getCountries();
-      navigator.vibrate(200);
+      navigator.vibrate(400);
     },
     async getCountries() {
       this.countries = await this.db.getAll('countries');
