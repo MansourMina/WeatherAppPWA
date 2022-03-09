@@ -247,7 +247,7 @@ export default {
       }
     },
     async getTimeZone() {
-      const api = `http://api.timezonedb.com/v2.1/get-time-zone?key=UKLC5A0XX12Q&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
+      const api = `https://api.timezonedb.com/v2.1/get-time-zone?key=UKLC5A0XX12Q&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
 
       const response = await fetch(api);
 

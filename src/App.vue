@@ -206,7 +206,7 @@ export default {
       }
     },
     async getTimeZone() {
-      const api = `http://api.timezonedb.com/v2.1/get-time-zone?key=${this.timeZoneKey}&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
+      const api = `https://api.timezonedb.com/v2.1/get-time-zone?key=${this.timeZoneKey}&format=json&by=position&lat=${this.lat}&lng=${this.long}`;
       const response = await fetch(api);
       if (!response.ok) {
         console.log('etwas schiefgelaufen');
