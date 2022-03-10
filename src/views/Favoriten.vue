@@ -118,6 +118,7 @@ export default {
     async removeCountry(country) {
       await this.db.delete('countries', country);
       this.getCountries();
+      navigator.vibrate(400);
     },
     async addFavorite(json) {
       await this.db.put('countries', json);
