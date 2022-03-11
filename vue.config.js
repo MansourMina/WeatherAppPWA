@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   pwa: {
     workboxPluginMode: 'InjectManifest',
@@ -23,6 +25,7 @@ module.exports = {
       ],
     },
   },
+  outputDir: path.resolve(__dirname, '../server/client'),
 
   transpileDependencies: ['vuetify'],
 };

@@ -2,7 +2,14 @@
   <div>
     <v-card v-if="notFound">
       <v-toolbar dark class="fixed-bar">
-        <v-btn icon dark @click="$emit('closeDialog')">
+        <v-btn
+          icon
+          dark
+          @click="
+            $emit('closeDialog');
+            notFound = false;
+          "
+        >
           <v-icon color="white">mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
@@ -61,7 +68,16 @@
         </v-btn>
 
         <v-spacer></v-spacer>
-        <v-btn dark text @click="dialog = true" class="white--text" v-if="!indexCountries.find(el => el.countryName == country)">
+        <v-btn
+          dark
+          text
+          @click="dialog = true"
+          class="white--text"
+          v-if="
+            !indexCountries.find((el) => el.countryName == country) &&
+            !showCurrent
+          "
+        >
           Hinzufügen
         </v-btn>
       </v-toolbar>
@@ -148,6 +164,12 @@ export default {
     },
     indexCountries: {
       type: Array,
+    },
+    currentCity: {
+      type: String,
+    },
+    showCurrent: {
+      type: Boolean,
     },
   },
 

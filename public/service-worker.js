@@ -6,9 +6,17 @@ if (workbox) {
   workbox.routing.registerRoute(
     new RegExp('/img/icons/.*.png'),
     new workbox.strategies.StaleWhileRevalidate({
-      cacheName: 'atams-image-cache',
+      cacheName: 'minas-cache',
     }),
   );
 } else {
   console.log(`Workbox didn't load`);
 }
+self.addEventListener('push', (event) => {
+  const data = event.data.json();
+  self.registration.showNotification(data.title, {
+    body: data.body.message,
+    icon: 'img/icons/android-chrome-192x192.png',
+  });
+});
+self.skipWaiting();

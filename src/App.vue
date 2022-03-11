@@ -1,5 +1,36 @@
 <template>
   <v-app>
+    <v-snackbar v-model="snackbar" :timeout="timeout" right height="50">
+      <span>
+        <v-icon class="mr-4 hidden-sm-and-down">mdi-bell-ring</v-icon>
+        <span class="">Benachrichtigungen aktivieren?</span>
+      </span>
+
+      <template v-slot:action="{ attrs }">
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green darken-1"
+            v-bind="attrs"
+            text
+            @click="
+              snackbar = false;
+              subscribe();
+            "
+          >
+            Ja
+          </v-btn>
+          <v-btn
+            color="red darken-1"
+            v-bind="attrs"
+            text
+            @click="snackbar = false"
+          >
+            Nein
+          </v-btn>
+        </v-card-actions>
+      </template>
+    </v-snackbar>
     <v-bottom-navigation v-model="value" shift app>
       <v-btn
         plain
@@ -101,6 +132,7 @@
         :getTime="getTime"
         @refreshTime="timeofCity = getTime(zoneName)"
         @refreshWeather="apiCall"
+        :currentCity="currentCity"
       />
     </v-main>
   </v-app>
@@ -108,12 +140,14 @@
 
 <script>
 import { openDB } from 'idb';
-
+import axios from 'axios';
 export default {
   name: 'App',
   data: () => ({
     drawer: false,
     background: '',
+    snackbar: false,
+    timeout: 5000,
     sunset: '',
     sunrise: '',
     zoneName: '',
@@ -124,6 +158,7 @@ export default {
     description: '',
     search: '',
     long: '',
+    currentCity: '',
     lat: '',
     openweatherKey: '52293b43835f810dfe6fc255311d9794',
     feelsLike: '',
@@ -134,10 +169,21 @@ export default {
     dialog: false,
     timeZoneKey: '1OPC3LTOMNKY',
     newJson: {},
+    serverAddress: process.env.VUE_APP_SERVER,
+
     value: 1,
     db: null,
+    publicVapidKey:
+      'BCxcBWBIlS4jWqPuqGCuhG-Ch33MI2eVrU4ZDVzC6OD0dGE3_nFpXsbzbb5QiqcRtpm9mVHzRlKnlnvFzcm3B8w',
   }),
   async created() {
+    const notification = localStorage.getItem('notification', true);
+    if (notification == null) {
+      setTimeout(() => {
+        this.snackbar = true;
+      }, 3000);
+    }
+
     this.db = await openDB('favoriteCountriesDB', 1, {
       upgrade(db) {
         db.createObjectStore('countries', { keyPath: 'countryName' });
@@ -170,6 +216,32 @@ export default {
     }
   },
   methods: {
+    urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+      const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    },
+    async subscribe() {
+      localStorage.setItem('notification', true);
+      if (!('serviceWorker' in navigator)) {
+        console.log('no service worker!');
+
+        return;
+      }
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: this.urlBase64ToUint8Array(this.publicVapidKey),
+      });
+      await axios.post(`${this.serverAddress}/subscribe`, subscription);
+    },
     async apiCall() {
       //  if (status == 'current') {
       // this.waiting = true;
@@ -183,6 +255,7 @@ export default {
         this.message = 'Can not read Position';
       } else {
         const json = await response.json();
+        this.currentCity = json.name;
         await this.getWeather(json);
         // this.waiting = false;
       }

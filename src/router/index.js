@@ -22,6 +22,14 @@ const routes = [
     name: 'About',
     component: About,
   },
+  {
+    path: '*',
+    redirect: () => {
+      // the function receives the target route as the argument
+      // we return a redirect path/location here.
+      return { path: '/' };
+    },
+  },
 ];
 
 const router = new VueRouter({
